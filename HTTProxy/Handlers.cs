@@ -37,7 +37,7 @@ namespace HTTProxy
             Match r = Regex.Match(request, @"(GET|POST)+\s.*\.(js|css|png|ico)+\s");
             if (r.Success) // Match file extensions for scripts/images: js,css,png,ico
             {
-                form.SendSequence(request, Form1.Sender.Handler);
+                form.SendSequence(request, Form1.Action.Auto);
                 return ""; // The request is done
             }
             else

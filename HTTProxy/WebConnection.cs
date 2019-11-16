@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.IO;
 
 namespace HTTProxy
 {
@@ -49,9 +51,26 @@ namespace HTTProxy
         }
         public byte[] Recv()
         {
-                byte[] buffer = new byte[BlockSize];
-                stream.Read(buffer, 0, BlockSize);
-                return buffer;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int bytes_read;
+                int offset = 0;
+                byte[] buffer = new byte[2048];
+                try
+                {
+                    while ((bytes_read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        ms.Write(buffer, 0, bytes_read);
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.GetType().ToString());
+                }
+
+                MessageBox.Show(ms.ToArray().Length.ToString());
+                return ms.ToArray();
+            }
         }
 
         public void Send(byte[] buffer)

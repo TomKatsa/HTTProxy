@@ -46,11 +46,25 @@ namespace HTTProxy
         {
             if (stream != null && data != null)
             {
-                stream.Write(data, 0, data.Length);
+                try
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+                catch
+                {
+
+                }
             }
 
 
         }
 
+
+        public static string Skipped =
+            @"HTTP/1.1 200 OK
+Connection: close
+Content-Length: 30
+
+The user skipped this request.";
     }
 }

@@ -13,26 +13,30 @@ namespace HTTProxy
 {
     public partial class Form1 : Form
     {
-        private Thread background;
-        private BrowserConnection browser;
-        private WebConnection web;
-        private IHandler file_ext_handle;
-        private byte[] request_bytes;
+        static string IP = "127.0.0.1";
+        static int PORT = 8080;
 
-        public enum Sender
+        Thread background;
+        BrowserConnection browser;
+        WebConnection web;
+        IHandler file_ext_handle;
+        //private byte[] request_bytes;
+
+        public enum Action
         {
-            User, Handler
+            User, Auto, Skip
         }
 
         public Form1()
         {
             web = new WebConnection(); // Connecting to web server
-            browser = new BrowserConnection("127.0.0.1", 8080); // Connecting to local browser
+            browser = new BrowserConnection(IP, PORT); // Connecting to local browser
             file_ext_handle = new FileExtHandler(this); // Handling file extension in request, to automatically receive images.
             background = new Thread(BackgroundThread); // To receive requests from browser and not block the UI
             background.IsBackground = true;
             background.Start();
             InitializeComponent();
+            label1.Text += PORT;
         }
 
 
@@ -40,8 +44,8 @@ namespace HTTProxy
         {
             string request = "";
             browser.Accept();
-            request_bytes = browser.Recv();
-            request = Encoding.ASCII.GetString(request_bytes);
+            //request_bytes = browser.Recv();
+            request = Encoding.ASCII.GetString(browser.Recv());
             request = file_ext_handle.Handle(request);
             WriteRequest(request);
         }
@@ -78,7 +82,7 @@ namespace HTTProxy
             string req = RequestBox.Text;
             if (!background.IsAlive || req != "") // Checking if not waiting for new request and request isn't empty
             {
-                SendSequence(req, Sender.User);
+                SendSequence(req, Action.User);
             }
         }
 
@@ -87,7 +91,7 @@ namespace HTTProxy
             string req = RequestBox.Text;
             if (!background.IsAlive || req != "") // Checking if not waiting for new request and request isn't empty
             {
-                SendSequence("", Sender.Handler); // Sending empty request
+                SendSequence(req, Action.Skip);
             }
 
         }
@@ -101,20 +105,20 @@ namespace HTTProxy
         }
 
 
-        public void SendSequence(string msg, Sender sender)
+        public void SendSequence(string msg, Action action)
         {
             string host = WebConnection.ParseHost(msg);
             WriteRequest("");
-            if (sender==Sender.User)
+            if (action==Action.User)
                 WriteResponse(""); // If the user requested, clear first the response
             if (host == "")
             {
                 RestartThread(); // Invalid host
                 return;
             }
-            if (msg=="")
+            if (action==Action.Skip)
             {
-                browser.Send(ASCIIEncoding.ASCII.GetBytes("Request skipped.")); // The skip button
+                browser.Send(ASCIIEncoding.ASCII.GetBytes(BrowserConnection.Skipped)); // The skip button
                 RestartThread();
                 return;
             }
@@ -123,7 +127,7 @@ namespace HTTProxy
                 web.Connect(host, 80);
                 web.Send(Encoding.ASCII.GetBytes(msg));
                 byte[] response = web.Recv();
-                if (sender==Sender.User)
+                if (action==Action.User)
                 {
                     WriteResponse(Encoding.ASCII.GetString(response)); // If user made the request, update the response box
                     // If the Handler made the request, leave the response box
@@ -150,6 +154,19 @@ namespace HTTProxy
                 file_ext_handle = new EmptyHandler(); // Don't automatically receive images/scripts
                 
             }
+        }
+
+        private void portBtn_Click(object sender, EventArgs e)
+        {
+            if (browser!=null)
+            {
+                
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
