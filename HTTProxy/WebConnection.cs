@@ -9,15 +9,21 @@ using System.Text.RegularExpressions;
 
 namespace HTTProxy
 {
-    class WebClient
+    class WebConnection
     {
         NetworkStream stream;
         private TcpClient client;
         private int BlockSize;
-        public WebClient()
+        bool failed;
+
+        public bool Failed { get => failed; set => failed = value; }
+
+        public WebConnection()
         {
-            BlockSize = 32000;
+            BlockSize = 1048576; // 1 MB Size
             client = new TcpClient();
+            client.ReceiveTimeout = 3000;
+            client.SendTimeout = 3000;
         }
         public void Connect(string host, int port)
         {
@@ -26,9 +32,20 @@ namespace HTTProxy
                 stream.Close();
                 client.Close();
                 client = new TcpClient();
+                client.ReceiveTimeout = 3000;
+                client.SendTimeout = 3000;
             }
-            client.Connect(host, port);
-            stream = client.GetStream();
+            try
+            {
+                client.Connect(host, port);
+                stream = client.GetStream();
+                failed = false;
+            }
+            catch
+            {
+                failed = true;
+            }
+
         }
         public byte[] Recv()
         {
@@ -43,9 +60,10 @@ namespace HTTProxy
         }
 
 
-        public static string ParseHost(string request)
+        public static string ParseHost(string request) // Match the host from the request using regex
         {
             Match match = Regex.Match(request, @"Host: .*\w");
+            if (!match.Success) return "";
             string host = match.ToString().Split(' ')[1];
             return host;
         }

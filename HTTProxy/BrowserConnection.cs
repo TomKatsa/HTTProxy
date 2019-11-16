@@ -9,12 +9,12 @@ using System.Text.RegularExpressions;
 
 namespace HTTProxy
 {
-    class BrowserServer
+    class BrowserConnection
     {
         NetworkStream stream;
         private TcpListener server;
         private TcpClient browser;
-        public BrowserServer(string ip, int port)
+        public BrowserConnection(string ip, int port)
         {
             server = new TcpListener(IPAddress.Parse(ip), port);
             server.Start();
@@ -29,6 +29,8 @@ namespace HTTProxy
                 stream.Close();
             }
             browser = server.AcceptTcpClient();
+            browser.ReceiveTimeout = 3000;
+            browser.SendTimeout = 3000;
             stream = browser.GetStream();
         }
 
@@ -42,7 +44,11 @@ namespace HTTProxy
 
         public void Send(byte[] data)
         {
+            if (stream != null && data != null)
+            {
                 stream.Write(data, 0, data.Length);
+            }
+
 
         }
 
