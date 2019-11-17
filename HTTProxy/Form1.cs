@@ -19,7 +19,10 @@ namespace HTTProxy
         Thread background;
         BrowserConnection browser;
         WebConnection web;
+
+        List<IHandler> handlers;
         IHandler file_ext_handle;
+        IHandler connection_header_handle;
         //private byte[] request_bytes;
 
         public enum Action
@@ -29,24 +32,40 @@ namespace HTTProxy
 
         public Form1()
         {
+
+            connection_header_handle = new ConnectionHeaderHandler(); // Changing the connection header to close
+            file_ext_handle = new FileExtHandler(this); // Handling file extension in request, to automatically receive images.
+            handlers = new List<IHandler> { file_ext_handle, connection_header_handle };
+
             web = new WebConnection(); // Connecting to web server
             browser = new BrowserConnection(IP, PORT); // Connecting to local browser
-            file_ext_handle = new FileExtHandler(this); // Handling file extension in request, to automatically receive images.
+            
             background = new Thread(BackgroundThread); // To receive requests from browser and not block the UI
             background.IsBackground = true;
             background.Start();
+
             InitializeComponent();
-            label1.Text += PORT;
+            portLabel.Text += PORT;
+        }
+
+        public string HandleRequest(string req)
+        {
+            string result = "";
+            foreach(IHandler handler in handlers)
+            {
+                result = handler.Handle(req);
+                if (result == "") break;
+            }
+            return result;
         }
 
 
         public void BackgroundThread()
         {
-            string request = "";
             browser.Accept();
             //request_bytes = browser.Recv();
-            request = Encoding.ASCII.GetString(browser.Recv());
-            request = file_ext_handle.Handle(request);
+            string request = Encoding.ASCII.GetString(browser.Recv());
+            request = HandleRequest(request);
             WriteRequest(request);
         }
         public void WriteRequest(string text) // Thread-safe writing to the Request TextBox
@@ -109,8 +128,6 @@ namespace HTTProxy
         {
             string host = WebConnection.ParseHost(msg);
             WriteRequest("");
-            if (action==Action.User)
-                WriteResponse(""); // If the user requested, clear first the response
             if (host == "")
             {
                 RestartThread(); // Invalid host
@@ -125,6 +142,10 @@ namespace HTTProxy
             try
             {
                 web.Connect(host, 80);
+                if (web.Failed)
+                {
+                    throw new Exception("Couldn't connect to host.");
+                }
                 web.Send(Encoding.ASCII.GetBytes(msg));
                 byte[] response = web.Recv();
                 if (action==Action.User)
@@ -136,7 +157,11 @@ namespace HTTProxy
                 browser.Send(response); // Receiving response in the browser
             }
             catch (Exception ex) {
-                WriteResponse(DateTime.Now.ToString("MM/dd/yyyy HH:mm") + " Exception: " + ex.Message);
+                if (action==Action.User) // If the user request failed, print an exception.
+                {
+                    WriteResponse(DateTime.Now.ToString("MM/dd/yyyy HH:mm") + " " + ex.GetType().ToString() + " " + ex.Message);
+                }
+                
             }
 
 
@@ -156,13 +181,8 @@ namespace HTTProxy
             }
         }
 
-        private void portBtn_Click(object sender, EventArgs e)
-        {
-            if (browser!=null)
-            {
-                
-            }
-        }
+
+
 
         private void Form1_Load(object sender, EventArgs e)
         {

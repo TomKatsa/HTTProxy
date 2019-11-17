@@ -46,4 +46,17 @@ namespace HTTProxy
             }
         }
     }
+
+    class ConnectionHeaderHandler : IHandler
+    {
+        Form1 form;
+        public ConnectionHeaderHandler()
+        {
+
+        }
+        public string Handle(string r)
+        {
+            return r.Replace("Connection: keep-alive", "Connection: close");
+        }
+    }
 }

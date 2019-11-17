@@ -33,7 +33,7 @@
             this.SendBtn = new System.Windows.Forms.Button();
             this.SkipBtn = new System.Windows.Forms.Button();
             this.FileCheckBox = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.portLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -91,16 +91,16 @@
             this.FileCheckBox.UseVisualStyleBackColor = true;
             this.FileCheckBox.CheckedChanged += new System.EventHandler(this.FileCheckBox_CheckedChanged);
             // 
-            // label1
+            // portLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.label1.Location = new System.Drawing.Point(12, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(124, 20);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Proxy on port: ";
+            this.portLabel.AutoSize = true;
+            this.portLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.portLabel.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.portLabel.Location = new System.Drawing.Point(12, 20);
+            this.portLabel.Name = "portLabel";
+            this.portLabel.Size = new System.Drawing.Size(124, 20);
+            this.portLabel.TabIndex = 5;
+            this.portLabel.Text = "Proxy on port: ";
             // 
             // label2
             // 
@@ -127,7 +127,7 @@
             this.ClientSize = new System.Drawing.Size(469, 678);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.portLabel);
             this.Controls.Add(this.FileCheckBox);
             this.Controls.Add(this.SkipBtn);
             this.Controls.Add(this.SendBtn);
@@ -149,7 +149,7 @@
         private System.Windows.Forms.Button SendBtn;
         private System.Windows.Forms.Button SkipBtn;
         private System.Windows.Forms.CheckBox FileCheckBox;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label portLabel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
     }
