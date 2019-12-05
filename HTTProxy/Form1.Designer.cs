@@ -36,6 +36,7 @@
             this.portLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.EncodingBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // RequestBox
@@ -120,11 +121,23 @@
             this.label3.TabIndex = 7;
             this.label3.Text = "Response:";
             // 
+            // EncodingBox
+            // 
+            this.EncodingBox.AutoSize = true;
+            this.EncodingBox.Location = new System.Drawing.Point(271, 641);
+            this.EncodingBox.Name = "EncodingBox";
+            this.EncodingBox.Size = new System.Drawing.Size(152, 17);
+            this.EncodingBox.TabIndex = 8;
+            this.EncodingBox.Text = "Remove Encoding Header";
+            this.EncodingBox.UseVisualStyleBackColor = true;
+            this.EncodingBox.CheckedChanged += new System.EventHandler(this.EncodingBox_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(469, 678);
+            this.Controls.Add(this.EncodingBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.portLabel);
@@ -152,6 +165,7 @@
         private System.Windows.Forms.Label portLabel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox EncodingBox;
     }
 }
 

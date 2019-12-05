@@ -34,7 +34,7 @@ namespace HTTProxy
         }
         public string Handle(string request)
         {
-            Match r = Regex.Match(request, @"(GET|POST)+\s.*\.(js|css|png|ico)+\s");
+            Match r = Regex.Match(request, @"(GET|POST)+\s.*\.(js|css|png|ico|gif)+\s");
             if (r.Success) // Match file extensions for scripts/images: js,css,png,ico
             {
                 form.SendSequence(request, Form1.Action.Auto);
@@ -49,14 +49,31 @@ namespace HTTProxy
 
     class ConnectionHeaderHandler : IHandler
     {
-        Form1 form;
         public ConnectionHeaderHandler()
         {
 
         }
-        public string Handle(string r)
+        public string Handle(string request)
         {
-            return r.Replace("Connection: keep-alive", "Connection: close");
+            return request.Replace("Connection: keep-alive", "Connection: close");
+        }
+    }
+
+    class EncodingHeaderHandler : IHandler
+    {
+        public EncodingHeaderHandler()
+        {
+
+        }
+        public string Handle(string request)
+        {
+
+            Match r = Regex.Match(request, @"Accept-Encoding: .*\s");
+            if (r.Success)
+            {
+                return request.Replace(r.Value, "");
+            }
+            return request;
         }
     }
 }

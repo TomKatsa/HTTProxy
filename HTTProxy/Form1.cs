@@ -23,6 +23,7 @@ namespace HTTProxy
         List<IHandler> handlers;
         IHandler file_ext_handle;
         IHandler connection_header_handle;
+        IHandler encoding_header_handle;
         //private byte[] request_bytes;
 
         public enum Action
@@ -35,7 +36,8 @@ namespace HTTProxy
 
             connection_header_handle = new ConnectionHeaderHandler(); // Changing the connection header to close
             file_ext_handle = new FileExtHandler(this); // Handling file extension in request, to automatically receive images.
-            handlers = new List<IHandler> { file_ext_handle, connection_header_handle };
+            encoding_header_handle = new EmptyHandler();
+            handlers = new List<IHandler> { file_ext_handle, connection_header_handle};
 
             web = new WebConnection(); // Connecting to web server
             browser = new BrowserConnection(IP, PORT); // Connecting to local browser
@@ -50,10 +52,10 @@ namespace HTTProxy
 
         public string HandleRequest(string req)
         {
-            string result = "";
+            string result = req;
             foreach(IHandler handler in handlers)
             {
-                result = handler.Handle(req);
+                result = handler.Handle(result);
                 if (result == "") break;
             }
             return result;
@@ -170,6 +172,7 @@ namespace HTTProxy
 
         private void FileCheckBox_CheckedChanged(object sender, EventArgs e)
         {
+            handlers.Remove(file_ext_handle); // Update Handlers
             if (FileCheckBox.Checked)
             {
                 file_ext_handle = new FileExtHandler(this); // Automatically receive images/scripts
@@ -179,14 +182,28 @@ namespace HTTProxy
                 file_ext_handle = new EmptyHandler(); // Don't automatically receive images/scripts
                 
             }
+            
+            handlers.Add(file_ext_handle); // Update Handlers
         }
-
-
-
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void EncodingBox_CheckedChanged(object sender, EventArgs e)
+        {
+            handlers.Remove(encoding_header_handle); // Update Handlers
+            if (EncodingBox.Checked)
+            {
+                encoding_header_handle = new EncodingHeaderHandler(); // Remove the Accept-Encoding header
+            }
+            else
+            {
+                encoding_header_handle = new EmptyHandler();
+            }
+             
+            handlers.Add(encoding_header_handle); // Update Handlers
         }
     }
 }

@@ -36,9 +36,16 @@ namespace HTTProxy
 
         public byte[] Recv()
         {
+            try
+            {
                 byte[] data = new byte[32000];
                 stream.Read(data, 0, 32000);
                 return data;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
 
         }
 
