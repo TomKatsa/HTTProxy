@@ -44,7 +44,8 @@ namespace HTTProxy
             }
             catch (Exception e)
             {
-                return null;
+                string error = DateTime.Now.ToString("MM/dd/yyyy HH:mm") + " HTTProxy: couldn't receive request | " + e.GetType().ToString() + " " + e.Message;
+                return Encoding.ASCII.GetBytes(error);
             }
 
         }
